@@ -33,8 +33,9 @@
   --info-100: #ecf1fc;
 
   /* Семантика поверхностей */
-  --bg: var(--surface-1);
+  --bg: #eef1f4;
   --card: var(--surface-0);
+  --card-hover: #fbfcfc;
   --text: var(--ink-800);
   --text-muted: var(--ink-500);
   --text-soft: var(--ink-400);
