@@ -241,13 +241,27 @@ function initP7() {
 
 function documentRow(row) {
   const tr = document.createElement("tr");
-  const name = textNode("td", row.file_name);
-  name.appendChild(textNode("div", `тип: ${row.predicted}`, "muted"));
-  tr.append(name, textNode("td", row.confidence.toFixed(2), "num"));
-  tr.append(textNode("td", row.requisites.counterparty || "—"));
-  tr.append(textNode("td", row.requisites.inn || "—", "mono"));
-  tr.append(textNode("td", row.requisites.amount ?? "—", "num"));
+  tr.append(nameCell(row), typeCell(row), textNode("td", row.requisites.counterparty || "—"), innCell(row), textNode("td", row.requisites.amount ?? "—", "num"));
   return tr;
+}
+
+function nameCell(row) {
+  const cell = textNode("td", row.file_name);
+  cell.appendChild(textNode("div", row.received_at || "", "muted"));
+  return cell;
+}
+
+function typeCell(row) {
+  const cell = textNode("td", row.predicted);
+  cell.appendChild(textNode("div", row.confidence.toFixed(2), "muted"));
+  return cell;
+}
+
+function innCell(row) {
+  const cell = textNode("td", row.requisites.inn || "—", "mono");
+  const broken = row.requisites.inn && !row.requisites.inn_valid;
+  if (broken) cell.appendChild(badge("ошибка", "risk"));
+  return cell;
 }
 
 function initP8() {

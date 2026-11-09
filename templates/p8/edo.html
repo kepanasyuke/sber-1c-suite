@@ -23,11 +23,11 @@
           {% for row in model.documents %}
           <tr>
             <td><b>{{ row.file_name }}</b><div class="muted">{{ row.received_at|dt }}</div></td>
-            <td>{{ m.badge('ok', row.predicted) }}<div class="muted">{{ "%.2f"|format(row.confidence) }}</div></td>
+            <td>{{ m.badge('plain', row.predicted) }}<div class="muted">{{ "%.2f"|format(row.confidence) }}</div></td>
             <td>{{ row.requisites.counterparty or "—" }}</td>
             <td class="mono">
               {{ row.requisites.inn or "—" }}
-              {% if row.requisites.inn %}{{ m.badge('ok' if row.requisites.inn_valid else 'risk', 'верный' if row.requisites.inn_valid else 'ошибка') }}{% endif %}
+              {% if row.requisites.inn and not row.requisites.inn_valid %}{{ m.badge('risk', 'ошибка') }}{% endif %}
             </td>
             <td class="num">{{ row.requisites.amount|decimal if row.requisites.amount else "—" }}</td>
           </tr>
@@ -47,7 +47,7 @@
       <div class="panel-body">
         <ul class="list-clean">
           {% for label, count in model.counts.items() %}
-          <li><span class="badge info">{{ label }}</span><span>{{ count }}</span></li>
+          <li><span class="badge plain">{{ label }}</span><span>{{ count }}</span></li>
           {% endfor %}
         </ul>
       </div>

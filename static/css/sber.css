@@ -294,6 +294,8 @@ h1, h2, h3, h4, p, figure { margin: 0; }
 .badge.risk { background: var(--risk-100); color: var(--risk-600); }
 .badge.info { background: var(--info-100); color: var(--info-600); }
 .badge.muted { background: var(--surface-2); color: var(--text-muted); }
+.badge.plain { background: none; padding: 0; color: var(--text); font-weight: var(--fw-medium); }
+.badge.plain::before { display: none; }
 
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--accent); }
 .dot.warn { background: var(--warn-600); }
