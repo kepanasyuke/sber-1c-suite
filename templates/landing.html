@@ -5,12 +5,12 @@
 
 <section class="hero">
   <div>
-    <span class="eyebrow">Портфель · 8 модулей · 1 контур</span>
-    <h1>Рабочее место аналитика <em>1С</em> с бэкендом, ИИ и оконным приложением</h1>
+    <span class="eyebrow">Портфель · 8 модулей · один контур</span>
+    <h1>Рабочее место аналитика <em>1С</em>: базы, обновления, права и ИИ</h1>
     <p class="lead">
-      Восемь модулей закрывают требования вакансии: обслуживание информационных баз
-      на PostgreSQL и MS SQL Server, обновление типовых конфигураций, права доступа,
-      Service Desk, разбор SQL и отчётность. Каждый модуль — API, офлайн-модель и интерфейс.
+      Восемь модулей закрывают требования вакансии: обслуживание информационных баз на PostgreSQL
+      и MS SQL Server, обновление типовых конфигураций, права доступа, Service Desk, разбор SQL
+      и отчётность. Каждый модуль — API, офлайн-модель и интерфейс.
     </p>
     <div class="row" style="margin-top: var(--sp-6);">
       <a class="btn" href="#products">Смотреть модули</a>
@@ -25,11 +25,49 @@
   </div>
 </section>
 
-<div class="grid kpi">
-  {{ m.kpi("Активных хостов", stats.hosts, "приложения, СУБД, веб") }}
-  {{ m.kpi("Баз под наблюдением", stats.bases, "бэкапы и контроль RPO") }}
-  {{ m.kpi("Средний срок решения", stats.mttr ~ " ч", "Service Desk, квартал") }}
-  {{ m.kpi("Открытых обращений", stats.open_tickets, "в работе сейчас") }}
+<div class="numbers">
+  <div class="number-item"><div class="number-value">{{ stats.hosts }}</div><div class="number-label">активных хостов кластера</div></div>
+  <div class="number-item"><div class="number-value">{{ stats.bases }}</div><div class="number-label">баз под наблюдением</div></div>
+  <div class="number-item"><div class="number-value">{{ stats.mttr }} ч</div><div class="number-label">средний срок решения</div></div>
+  <div class="number-item"><div class="number-value">{{ stats.open_tickets }}</div><div class="number-label">обращений в работе</div></div>
+</div>
+
+<div class="section-head">
+  <h2>Фишки</h2>
+  <span>что отличает портфель от демо-страницы</span>
+</div>
+
+<div class="features">
+  <div class="feature">
+    <div class="feature-icon">01</div>
+    <h3>ИИ без внешних сервисов</h3>
+    <p>TF-IDF со стеммером, центроидный классификатор, BM25 и робастный z-скоринг считаются в процессе приложения. Данные не покидают контур.</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">02</div>
+    <h3>Реальные запросы к PostgreSQL</h3>
+    <p>Каждый экран читает данные из базы: метрики, журналы, права, версии конфигураций, обращения, документы. Никаких заглушек в разметке.</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">03</div>
+    <h3>Оконное приложение</h3>
+    <p>Тот же интерфейс открывается нативным окном через WebView2: сервер поднимается в фоне, порт выбирается свободный.</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">04</div>
+    <h3>Правила стиля в CI</h3>
+    <p>Один выход из функции, не больше двух инструкций, без while, break и continue. Собственный AST-линтер роняет сборку при нарушении.</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">05</div>
+    <h3>Дизайн на токенах</h3>
+    <p>Палитра, шкала кеглей, отступы по базису 4 px, радиусы и движение собраны в одном файле токенов. Компоненты используют только их.</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">06</div>
+    <h3>Честные метрики</h3>
+    <p>Точность маршрутизации считается leave-one-out на размеченном наборе и выводится на экран как есть, без подгонки под красивую цифру.</p>
+  </div>
 </div>
 
 <div class="section-head" id="products">
@@ -46,7 +84,7 @@
 
 <div class="grid cards" id="product-grid">
   {% for item in modules %}
-  <a class="card link product" href="{{ item.path }}" data-tags="{{ item.tags|join(' ') }}" data-search="{{ item.title|lower }} {{ item.stack|join(' ')|lower }}">
+  <a class="card link product" href="{{ item.path }}" data-tags="{{ item.tags|join(' ') }}">
     <div class="row">
       <span class="card-code">{{ item.code }}</span>
       <span class="right tag {{ 'dark' if item.accent == 'graphite' else 'green' }}">{{ item.tags|join(' · ') }}</span>
@@ -63,6 +101,29 @@
 <p class="muted" id="product-empty" hidden>Под этот фильтр модулей нет — выберите другой.</p>
 
 <div class="section-head">
+  <h2>Как это работает</h2>
+  <span>от базы до вывода модели</span>
+</div>
+
+<div class="steps">
+  <div class="step">
+    <div class="step-num">Шаг 1</div>
+    <h3>Читает базу</h3>
+    <p>Модуль забирает срез из PostgreSQL: метрики хостов, журналы копирования, матрицу прав, версии объектов или текст документа.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">Шаг 2</div>
+    <h3>Считает модель</h3>
+    <p>Офлайн-модель находит выбросы, классифицирует причину, подбирает статью базы знаний, проверяет контрольные числа или арифметику отчёта.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">Шаг 3</div>
+    <h3>Показывает вывод</h3>
+    <p>Результат возвращается по API и сразу виден на экране: причина, приоритет по SLA, рекомендация по индексу или чек-лист обновления.</p>
+  </div>
+</div>
+
+<div class="section-head">
   <h2>Дизайн-система</h2>
   <span>токены, на которых собран интерфейс</span>
 </div>
@@ -71,10 +132,10 @@
   <div class="panel">
     <div class="panel-head"><h2>Шкала кеглей</h2><span class="count">размер / вес</span></div>
     <div class="panel-body">
-      <div class="type-row"><span class="type-sample" style="font-size: 38px; letter-spacing: -0.028em; font-weight: 800;">Заголовок H1</span><span class="muted mono">38 / 800</span></div>
-      <div class="type-row"><span class="type-sample" style="font-size: 26px; letter-spacing: -0.022em; font-weight: 800;">Заголовок H2</span><span class="muted mono">26 / 800</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 38px; letter-spacing: -0.028em; font-weight: 800;">Заголовок страницы</span><span class="muted mono">38 / 800</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 26px; letter-spacing: -0.022em; font-weight: 800;">Заголовок секции</span><span class="muted mono">26 / 800</span></div>
       <div class="type-row"><span class="type-sample" style="font-size: 19px; font-weight: 700;">Заголовок панели</span><span class="muted mono">19 / 700</span></div>
-      <div class="type-row"><span class="type-sample" style="font-size: 17px;">Основной текст карточки</span><span class="muted mono">17 / 400</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 17px;">Основной текст</span><span class="muted mono">17 / 400</span></div>
       <div class="type-row"><span class="type-sample" style="font-size: 15px;">Строка таблицы</span><span class="muted mono">15 / 400</span></div>
       <div class="type-row"><span class="type-sample" style="font-size: 13px; font-weight: 600;">Подпись</span><span class="muted mono">13 / 600</span></div>
       <div class="type-row"><span class="type-sample" style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;">Надзаголовок</span><span class="muted mono">11 / 600</span></div>
@@ -86,41 +147,29 @@
       <div class="panel-head"><h2>Палитра</h2></div>
       <div class="panel-body">
         <div class="swatches">
-          <div class="swatch" style="background: var(--green-600);">green 600</div>
-          <div class="swatch" style="background: var(--green-700);">green 700</div>
-          <div class="swatch" style="background: var(--green-100); color: var(--green-700);">green 100</div>
-          <div class="swatch" style="background: var(--ink-800);">ink 800</div>
-          <div class="swatch" style="background: var(--ink-500);">ink 500</div>
-          <div class="swatch" style="background: var(--surface-2); color: var(--ink-500);">surface 2</div>
-          <div class="swatch" style="background: var(--warn-600);">warn</div>
-          <div class="swatch" style="background: var(--risk-600);">risk</div>
+          <div class="swatch" style="background: var(--green-600);">зелёный 600</div>
+          <div class="swatch" style="background: var(--green-700);">зелёный 700</div>
+          <div class="swatch" style="background: var(--green-100); color: var(--green-700);">зелёный 100</div>
+          <div class="swatch" style="background: var(--ink-800);">графит 800</div>
+          <div class="swatch" style="background: var(--ink-500);">графит 500</div>
+          <div class="swatch" style="background: var(--surface-2); color: var(--ink-500);">поверхность</div>
+          <div class="swatch" style="background: var(--warn-600);">внимание</div>
+          <div class="swatch" style="background: var(--risk-600);">риск</div>
         </div>
-        <p class="muted" style="margin-top: var(--sp-3);">Зелёный 600 — единственный акцент, остальное — графит и нейтральные поверхности.</p>
+        <p class="muted" style="margin-top: var(--sp-3);">Плоская графика: структуру держат обводки, тени выключены. Зелёный — единственный акцент.</p>
       </div>
-    </div>
-
-    <div class="ai-block">
-      <h3>ИИ без внешних сервисов</h3>
-      <p class="muted">TF-IDF и центроидный классификатор со стеммером, BM25 для базы знаний, робастный z-скоринг на медиане и MAD. Считается в процессе приложения.</p>
     </div>
   </div>
 </div>
 
-<div class="section-head">
-  <h2>Как устроен код</h2>
-  <span>правила, которые проверяются автоматически</span>
-</div>
-
-<div class="panel">
-  <div class="panel-head"><h2>Стиль, который держит линтер</h2><span class="count">style_lint · ST001–ST004</span></div>
-  <div class="panel-body">
-    <div class="grid kpi">
-      <div class="kpi"><div class="kpi-label">ST001</div><div class="kpi-value" style="font-size: 17px;">Один выход</div><div class="kpi-hint">return и while считаются выходом</div></div>
-      <div class="kpi"><div class="kpi-label">ST002</div><div class="kpi-value" style="font-size: 17px;">≤ 2 инструкций</div><div class="kpi-hint">тело функции не длиннее двух строк</div></div>
-      <div class="kpi"><div class="kpi-label">ST003</div><div class="kpi-value" style="font-size: 17px;">Без циклов-выходов</div><div class="kpi-hint">нет while, break, continue</div></div>
-      <div class="kpi"><div class="kpi-label">ST004</div><div class="kpi-value" style="font-size: 17px;">То же в JS</div><div class="kpi-hint">запреты продублированы для модулей</div></div>
-    </div>
-    <p class="muted" style="margin-top: var(--sp-4);">Проверка: <span class="mono">python tools/style_lint.py</span> · нарушение роняет тест <span class="mono">tests/test_style.py</span>.</p>
+<div class="cta-band">
+  <div style="flex: 1; min-width: 280px;">
+    <h2>Разверните портфель локально</h2>
+    <p>Одна команда поднимает приложение на PostgreSQL, схема и демо-данные создаются при старте. Оконная версия — та же команда с другим модулем.</p>
+  </div>
+  <div class="row">
+    <a class="btn" href="/p6">Открыть демо</a>
+    <a class="btn ghost" href="/docs">Схемы API</a>
   </div>
 </div>
 
