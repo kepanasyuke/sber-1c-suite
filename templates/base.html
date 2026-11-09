@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ page_title|default("Портфель решений") }}{% endblock %} · 1С и ИИ</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/sber.css">
 </head>
 <body data-page="{{ page_id|default('') }}">
@@ -13,14 +15,14 @@
       <span class="brand-mark">1С</span>
       <span>Портфель решений<small>администрирование · разработка · ИИ</small></span>
     </a>
-    <nav class="nav">
+    <nav class="nav" aria-label="Модули портфеля">
       <a href="/" class="{{ 'active' if page_id == 'landing' else '' }}">Обзор</a>
       {% for item in nav %}
-      <a href="{{ item.path }}" class="{{ 'active' if active == item.code else '' }}">{{ item.code }}</a>
+      <a href="{{ item.path }}" class="{{ 'active' if active == item.code else '' }}" title="{{ item.title }}">{{ item.code }}</a>
       {% endfor %}
     </nav>
     <div class="spacer"></div>
-    <a class="btn ghost" href="/docs">API</a>
+    <a class="btn ghost sm" href="/docs">API</a>
   </div>
 </header>
 <main class="shell">
@@ -30,6 +32,7 @@
     <span>Данные синтетические, локальный контур: FastAPI · PostgreSQL · офлайн-модели.</span>
   </footer>
 </main>
+<div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
 <script type="module" src="/static/js/app.js"></script>
 </body>
 </html>

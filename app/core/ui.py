@@ -6,7 +6,7 @@ from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
 
-from app.catalog import MODULES, NAV
+from app.catalog import MODULES, NAV, TAG_COUNTS
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 TEMPLATES_DIR = BASE_DIR / "templates"
@@ -30,7 +30,7 @@ def short_date(value):
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 templates.env.filters.update({"spaces": spaces, "decimal": decimal, "dt": dt, "date": short_date})
-templates.env.globals.update({"modules": MODULES, "nav": NAV})
+templates.env.globals.update({"modules": MODULES, "nav": NAV, "tag_counts": TAG_COUNTS})
 
 
 def page(request, template, context):

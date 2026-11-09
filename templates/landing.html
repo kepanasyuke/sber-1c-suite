@@ -1,40 +1,52 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% import "_macros.html" as m %}
 {% block title %}Портфель решений для 1С{% endblock %}
 {% block content %}
 
 <section class="hero">
   <div>
-    <span class="eyebrow">Портфель · 8 проектов</span>
-    <h1>Администрирование и разработка <em>1С</em> с бэкендом, фронтендом и ИИ</h1>
+    <span class="eyebrow">Портфель · 8 модулей · 1 контур</span>
+    <h1>Рабочее место аналитика <em>1С</em> с бэкендом, ИИ и оконным приложением</h1>
     <p class="lead">
-      Восемь рабочих модулей закрывают требования вакансии: обслуживание информационных баз
+      Восемь модулей закрывают требования вакансии: обслуживание информационных баз
       на PostgreSQL и MS SQL Server, обновление типовых конфигураций, права доступа,
-      Service Desk и интеграции. Каждый модуль — FastAPI, PostgreSQL, офлайн-модель и интерфейс.
+      Service Desk, разбор SQL и отчётность. Каждый модуль — API, офлайн-модель и интерфейс.
     </p>
+    <div class="row" style="margin-top: var(--sp-6);">
+      <a class="btn" href="#products">Смотреть модули</a>
+      <a class="btn ghost" href="/p6">Демо: маршрутизация</a>
+    </div>
   </div>
   <div class="hero-side">
-    <div class="hero-note"><b>Проектов в портфеле</b><span>{{ stats.projects }}</span></div>
+    <div class="hero-note"><b>Модулей</b><span>{{ stats.projects }}</span></div>
     <div class="hero-note"><b>Метрик в базе</b><span>{{ stats.metrics|spaces }}</span></div>
-    <div class="hero-note"><b>Демо-данных, записей</b><span>{{ stats.rows|spaces }}</span></div>
+    <div class="hero-note"><b>Записей в контуре</b><span>{{ stats.rows|spaces }}</span></div>
+    <div class="hero-note"><b>Точность роутера</b><span>{{ stats.routing }} %</span></div>
   </div>
 </section>
 
-<div class="grid kpi" style="margin-bottom: 34px;">
-  {{ m.kpi("Активных хостов", stats.hosts, "кластер 1С: приложения, СУБД, веб") }}
-  {{ m.kpi("Баз под наблюдением", stats.bases, "резервное копирование и RPO") }}
-  {{ m.kpi("Средний срок решения", stats.mttr ~ " ч", "Service Desk, синтетика за квартал") }}
-  {{ m.kpi("Точность маршрутизации", stats.routing ~ " %", "кросс-валидация на 25 обращениях") }}
+<div class="grid kpi">
+  {{ m.kpi("Активных хостов", stats.hosts, "приложения, СУБД, веб") }}
+  {{ m.kpi("Баз под наблюдением", stats.bases, "бэкапы и контроль RPO") }}
+  {{ m.kpi("Средний срок решения", stats.mttr ~ " ч", "Service Desk, квартал") }}
+  {{ m.kpi("Открытых обращений", stats.open_tickets, "в работе сейчас") }}
 </div>
 
-<div class="section-head">
-  <h2>Проекты портфеля</h2>
-  <span>бэкенд · ИИ · фронтенд в каждом модуле</span>
+<div class="section-head" id="products">
+  <h2>Модули портфеля</h2>
+  <span>бэкенд · ИИ · фронтенд в каждом</span>
 </div>
 
-<div class="grid cards">
+<div class="chips" id="product-filter" style="margin-bottom: var(--sp-4);" role="group" aria-label="Фильтр модулей">
+  <button class="chip active" data-filter="all">Все <span class="chip-count">{{ modules|length }}</span></button>
+  <button class="chip" data-filter="бэк">Бэкенд <span class="chip-count">{{ tag_counts["бэк"] }}</span></button>
+  <button class="chip" data-filter="ИИ">ИИ <span class="chip-count">{{ tag_counts["ИИ"] }}</span></button>
+  <button class="chip" data-filter="фронт">Фронтенд <span class="chip-count">{{ tag_counts["фронт"] }}</span></button>
+</div>
+
+<div class="grid cards" id="product-grid">
   {% for item in modules %}
-  <a class="card link" href="{{ item.path }}">
+  <a class="card link product" href="{{ item.path }}" data-tags="{{ item.tags|join(' ') }}" data-search="{{ item.title|lower }} {{ item.stack|join(' ')|lower }}">
     <div class="row">
       <span class="card-code">{{ item.code }}</span>
       <span class="right tag {{ 'dark' if item.accent == 'graphite' else 'green' }}">{{ item.tags|join(' · ') }}</span>
@@ -48,43 +60,67 @@
   {% endfor %}
 </div>
 
+<p class="muted" id="product-empty" hidden>Под этот фильтр модулей нет — выберите другой.</p>
+
+<div class="section-head">
+  <h2>Дизайн-система</h2>
+  <span>токены, на которых собран интерфейс</span>
+</div>
+
+<div class="split">
+  <div class="panel">
+    <div class="panel-head"><h2>Шкала кеглей</h2><span class="count">размер / вес</span></div>
+    <div class="panel-body">
+      <div class="type-row"><span class="type-sample" style="font-size: 38px; letter-spacing: -0.028em; font-weight: 800;">Заголовок H1</span><span class="muted mono">38 / 800</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 26px; letter-spacing: -0.022em; font-weight: 800;">Заголовок H2</span><span class="muted mono">26 / 800</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 19px; font-weight: 700;">Заголовок панели</span><span class="muted mono">19 / 700</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 17px;">Основной текст карточки</span><span class="muted mono">17 / 400</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 15px;">Строка таблицы</span><span class="muted mono">15 / 400</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 13px; font-weight: 600;">Подпись</span><span class="muted mono">13 / 600</span></div>
+      <div class="type-row"><span class="type-sample" style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;">Надзаголовок</span><span class="muted mono">11 / 600</span></div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="panel">
+      <div class="panel-head"><h2>Палитра</h2></div>
+      <div class="panel-body">
+        <div class="swatches">
+          <div class="swatch" style="background: var(--green-600);">green 600</div>
+          <div class="swatch" style="background: var(--green-700);">green 700</div>
+          <div class="swatch" style="background: var(--green-100); color: var(--green-700);">green 100</div>
+          <div class="swatch" style="background: var(--ink-800);">ink 800</div>
+          <div class="swatch" style="background: var(--ink-500);">ink 500</div>
+          <div class="swatch" style="background: var(--surface-2); color: var(--ink-500);">surface 2</div>
+          <div class="swatch" style="background: var(--warn-600);">warn</div>
+          <div class="swatch" style="background: var(--risk-600);">risk</div>
+        </div>
+        <p class="muted" style="margin-top: var(--sp-3);">Зелёный 600 — единственный акцент, остальное — графит и нейтральные поверхности.</p>
+      </div>
+    </div>
+
+    <div class="ai-block">
+      <h3>ИИ без внешних сервисов</h3>
+      <p class="muted">TF-IDF и центроидный классификатор со стеммером, BM25 для базы знаний, робастный z-скоринг на медиане и MAD. Считается в процессе приложения.</p>
+    </div>
+  </div>
+</div>
+
 <div class="section-head">
   <h2>Как устроен код</h2>
   <span>правила, которые проверяются автоматически</span>
 </div>
 
-<div class="split">
-  <div class="panel">
-    <div class="panel-head"><h2>Стиль, который держит линтер</h2></div>
-    <div class="panel-body">
-      <ul class="list-clean">
-        <li><b>ST001</b><span>один выход из функции: <span class="mono">return</span> и <span class="mono">while</span> считаются выходом, второй выход — ошибка сборки.</span></li>
-        <li><b>ST002</b><span>тело функции — не больше двух инструкций, остальное выносится в именованные помощники.</span></li>
-        <li><b>ST003</b><span>запрещены <span class="mono">while</span>, <span class="mono">break</span>, <span class="mono">continue</span> — вместо них включения, фильтры и рекурсия по дереву.</span></li>
-        <li><b>ST004</b><span>те же запреты для фронтенд-модулей: вся логика — на выражениях и <span class="mono">for...of</span>.</span></li>
-      </ul>
-      <p class="muted" style="margin-top: 16px;">Проверка: <span class="mono">python tools/style_lint.py</span> · линтер включён в тесты.</p>
+<div class="panel">
+  <div class="panel-head"><h2>Стиль, который держит линтер</h2><span class="count">style_lint · ST001–ST004</span></div>
+  <div class="panel-body">
+    <div class="grid kpi">
+      <div class="kpi"><div class="kpi-label">ST001</div><div class="kpi-value" style="font-size: 17px;">Один выход</div><div class="kpi-hint">return и while считаются выходом</div></div>
+      <div class="kpi"><div class="kpi-label">ST002</div><div class="kpi-value" style="font-size: 17px;">≤ 2 инструкций</div><div class="kpi-hint">тело функции не длиннее двух строк</div></div>
+      <div class="kpi"><div class="kpi-label">ST003</div><div class="kpi-value" style="font-size: 17px;">Без циклов-выходов</div><div class="kpi-hint">нет while, break, continue</div></div>
+      <div class="kpi"><div class="kpi-label">ST004</div><div class="kpi-value" style="font-size: 17px;">То же в JS</div><div class="kpi-hint">запреты продублированы для модулей</div></div>
     </div>
-  </div>
-
-  <div class="stack">
-    <div class="ai-block">
-      <h3>ИИ без внешних сервисов</h3>
-      <p>TF-IDF и центроидный классификатор, BM25 для базы знаний, робастный z-скоринг на медиане и MAD.
-         Всё считается в процессе приложения, данные не покидают контур.</p>
-      <p class="muted">Подключение внешней LLM — переменная окружения <span class="mono">LLM_BASE_URL</span>.</p>
-    </div>
-    <div class="panel">
-      <div class="panel-head"><h2>Стек</h2></div>
-      <div class="panel-body">
-        <div class="card-foot" style="margin: 0;">
-          <span class="tag green">Python 3</span><span class="tag green">FastAPI</span>
-          <span class="tag green">PostgreSQL 16</span><span class="tag">Jinja2</span>
-          <span class="tag">ES-модули</span><span class="tag">ruff</span>
-          <span class="tag">pytest</span><span class="tag">style_lint</span>
-        </div>
-      </div>
-    </div>
+    <p class="muted" style="margin-top: var(--sp-4);">Проверка: <span class="mono">python tools/style_lint.py</span> · нарушение роняет тест <span class="mono">tests/test_style.py</span>.</p>
   </div>
 </div>
 

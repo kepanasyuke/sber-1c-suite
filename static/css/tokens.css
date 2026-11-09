@@ -1,0 +1,137 @@
+/* Дизайн-токены: палитра, типографика, отступы, радиусы, тени, движение.
+   Значения собраны в духе фирменной системы Сбера: зелёный 600 как акцент,
+   графитовые чернила, нейтральные поверхности, базис отступов 4/8 px. */
+
+:root {
+  /* Палитра */
+  --green-700: #17862c;
+  --green-600: #21a038;
+  --green-500: #2fb350;
+  --green-200: #bfe6c8;
+  --green-100: #e9f7ec;
+  --green-050: #f4fbf6;
+
+  --ink-900: #080808;
+  --ink-800: #121214;
+  --ink-700: #1f2124;
+  --ink-500: #565b62;
+  --ink-400: #8a9098;
+  --ink-300: #b4bac1;
+
+  --surface-0: #ffffff;
+  --surface-1: #f7f8fa;
+  --surface-2: #f1f3f5;
+
+  --line-100: #e6e8eb;
+  --line-200: #d8dce1;
+
+  --warn-600: #e08600;
+  --warn-100: #fdf4e2;
+  --risk-600: #d92d20;
+  --risk-100: #fdecea;
+  --info-600: #2a6fdb;
+  --info-100: #ecf1fc;
+
+  /* Семантика поверхностей */
+  --bg: var(--surface-1);
+  --card: var(--surface-0);
+  --text: var(--ink-800);
+  --text-muted: var(--ink-500);
+  --text-soft: var(--ink-400);
+  --border: var(--line-100);
+  --border-strong: var(--line-200);
+  --accent: var(--green-600);
+  --accent-strong: var(--green-700);
+  --accent-soft: var(--green-100);
+
+  /* Шкала кеглей: размер / межстрочный / трекинг */
+  --fs-display: 54px;
+  --lh-display: 1.04;
+  --tr-display: -0.035em;
+  --fs-h1: 38px;
+  --lh-h1: 1.1;
+  --tr-h1: -0.028em;
+  --fs-h2: 26px;
+  --lh-h2: 1.2;
+  --tr-h2: -0.022em;
+  --fs-h3: 19px;
+  --lh-h3: 1.3;
+  --tr-h3: -0.014em;
+  --fs-lead: 17px;
+  --lh-lead: 1.55;
+  --fs-body: 15px;
+  --lh-body: 1.55;
+  --fs-small: 13px;
+  --lh-small: 1.5;
+  --fs-caption: 12px;
+  --lh-caption: 1.4;
+  --fs-overline: 11px;
+  --tr-overline: 0.08em;
+  --fs-metric: 30px;
+  --tr-metric: -0.03em;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-black: 800;
+
+  /* Отступы: шаг 4 px */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 40px;
+  --sp-9: 48px;
+  --sp-10: 64px;
+
+  /* Радиусы */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Тени */
+  --sh-1: 0 1px 2px rgba(8, 8, 8, 0.05);
+  --sh-2: 0 1px 2px rgba(8, 8, 8, 0.04), 0 8px 24px rgba(8, 8, 8, 0.06);
+  --sh-3: 0 12px 40px rgba(8, 8, 8, 0.12);
+  --sh-accent: 0 10px 30px rgba(33, 160, 56, 0.18);
+
+  /* Движение */
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Прочее */
+  --container: 1280px;
+  --gutter: var(--sp-6);
+  --focus-ring: 0 0 0 3px rgba(33, 160, 56, 0.25);
+  --font: "SB Sans Text", "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+}
+
+@media (max-width: 1100px) {
+  :root {
+    --fs-display: 40px;
+    --fs-h1: 30px;
+    --fs-h2: 22px;
+    --fs-metric: 26px;
+    --gutter: var(--sp-5);
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --fs-display: 32px;
+    --fs-h1: 26px;
+    --fs-h2: 20px;
+    --fs-lead: 16px;
+    --gutter: var(--sp-4);
+  }
+}

@@ -1,5 +1,6 @@
 import { getJSON, postJSON } from "./api.js";
 import { lineChart } from "./charts.js";
+import { setLoading, toast } from "./components.js";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -95,9 +96,12 @@ function renderLogs(rows) {
 function initP2() {
   $$("[data-job]").forEach((button) => {
     button.addEventListener("click", async () => {
+      setLoading(button, true);
       const verdict = await postJSON(`/p2/api/analyze/${button.dataset.job}`);
       setText("#p2-summary", verdict.summary);
       renderLogs(verdict.logs);
+      setLoading(button, false);
+      toast(verdict.title, verdict.priority === "критический" ? "risk" : "ok");
     });
   });
 }
@@ -118,11 +122,14 @@ function riskRow(user) {
 
 function initP3() {
   $("#p3-recount").addEventListener("click", async () => {
+    const body = $("#p3-rows");
+    setLoading(body, true);
     const model = await postJSON("/p3/api/recount");
     setText("#p3-summary", model.summary);
-    const body = $("#p3-rows");
     clear(body);
     model.risky.forEach((user) => body.appendChild(riskRow(user)));
+    setLoading(body, false);
+    toast(`Пересчитано: высокий риск у ${model.kpis.high} из ${model.kpis.total}`, model.kpis.high > 0 ? "risk" : "ok");
   });
 }
 
@@ -198,9 +205,13 @@ function initP5() {
 
 function initP6() {
   $("#p6-route").addEventListener("click", async () => {
+    const button = $("#p6-route");
+    setLoading(button, true);
     const result = await postJSON("/p6/api/route", { subject: $("#p6-subject").value, body: $("#p6-body").value });
     setText("#p6-summary", result.summary);
     setText("#p6-draft", result.draft);
+    setLoading(button, false);
+    toast(`Группа: ${result.label} · ${result.priority}`, result.priority === "критический" ? "risk" : "ok");
   });
 }
 
@@ -241,11 +252,15 @@ function documentRow(row) {
 
 function initP8() {
   $("#p8-run").addEventListener("click", async () => {
-    const model = await postJSON("/p8/api/classify");
+    const button = $("#p8-run");
     const body = $("#p8-rows");
+    setLoading(body, true);
+    const model = await postJSON("/p8/api/classify");
     clear(body);
     model.documents.forEach((row) => body.appendChild(documentRow(row)));
     setText("#p8-summary", model.summary);
+    setLoading(body, false);
+    toast(`Классифицировано документов: ${model.kpis.total}`, model.kpis.bad_inn > 0 ? "risk" : "ok");
   });
 }
 

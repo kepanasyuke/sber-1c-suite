@@ -101,4 +101,7 @@ MODULES = [
 
 NAV = [{"code": item["code"], "path": item["path"], "title": item["title"]} for item in MODULES]
 
-__all__ = ["MODULES", "NAV"]
+TAGS = ("бэк", "ИИ", "фронт")
+TAG_COUNTS = {tag: sum(1 for item in MODULES if tag in item["tags"]) for tag in TAGS}
+
+__all__ = ["MODULES", "NAV", "TAG_COUNTS", "TAGS"]
