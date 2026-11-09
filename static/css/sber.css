@@ -8,7 +8,6 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font);
   font-size: var(--fs-body);
@@ -16,6 +15,13 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(180deg, rgba(33, 160, 56, 0.07) 0, rgba(33, 160, 56, 0) 440px),
+    radial-gradient(rgba(8, 8, 8, 0.055) 1px, transparent 1px);
+  background-size: 100% 440px, 22px 22px;
+  background-repeat: no-repeat, repeat;
+  background-attachment: scroll, fixed;
 }
 
 a { color: var(--accent-strong); text-decoration: none; transition: color var(--dur-1) var(--ease); }
@@ -45,6 +51,7 @@ h1, h2, h3, h4, p, figure { margin: 0; }
   z-index: 50;
   background: rgba(255, 255, 255, 0.86);
   backdrop-filter: saturate(180%) blur(14px);
+  border-top: 3px solid var(--accent);
   border-bottom: 1px solid var(--border);
 }
 
@@ -134,20 +141,6 @@ h1, h2, h3, h4, p, figure { margin: 0; }
   gap: var(--sp-8);
   align-items: end;
   padding: var(--sp-9) 0 var(--sp-8);
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  top: calc(var(--sp-10) * -1);
-  right: -8%;
-  width: 560px;
-  height: 560px;
-  max-width: 60vw;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, rgba(33, 160, 56, 0.18), rgba(33, 160, 56, 0) 68%);
-  filter: blur(6px);
-  pointer-events: none;
-  z-index: -1;
 }
 .eyebrow {
   display: inline-flex;
