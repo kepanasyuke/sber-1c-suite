@@ -1,0 +1,28 @@
+{% macro kpi(label, value, hint=None, unit=None) %}
+<div class="kpi">
+  <div class="kpi-label">{{ label }}</div>
+  <div class="kpi-value">{{ value }}{% if unit %} <small>{{ unit }}</small>{% endif %}</div>
+  {% if hint %}<div class="kpi-hint">{{ hint }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro badge(level, text) %}
+<span class="badge {{ level }}">{{ text }}</span>
+{% endmacro %}
+
+{% macro meter(value, tone='') %}
+<div class="meter"><span class="{{ tone }}" style="width: {{ [value, 100]|min }}%"></span></div>
+{% endmacro %}
+
+{% macro ai_block(title, text) %}
+<div class="ai-block">
+  <h3>{{ title }}</h3>
+  <pre>{{ text }}</pre>
+</div>
+{% endmacro %}
+
+{% macro page_head(code, title, lead) %}
+<div class="breadcrumb"><a href="/">Портфель</a> / {{ code }}</div>
+<h1 class="page-title">{{ title }}</h1>
+<p class="page-lead">{{ lead }}</p>
+{% endmacro %}

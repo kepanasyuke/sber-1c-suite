@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ m.page_head("P6", "Service Desk с ИИ-маршрутизацией", "Обращение классифицируется центроидной моделью на TF-IDF по группе поддержки, приоритет определяется по тексту, статья базы знаний подбирается BM25, черновик ответа собирается сразу.") }}
+
+<div class="grid kpi">
+  {{ m.kpi("Обращений", model.kpis.total, "за квартал") }}
+  {{ m.kpi("Открыто", model.kpis.open, "в работе") }}
+  {{ m.kpi("Просрочено SLA", model.kpis.overdue, "по сроку группы") }}
+  {{ m.kpi("Критических", model.kpis.critical, "SLA 2 ч") }}
+  {{ m.kpi("Точность маршрутизации", model.accuracy.accuracy ~ " %", "leave-one-out, " ~ model.accuracy.samples ~ " примеров") }}
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="panel">
+    <div class="panel-head"><h2>Новое обращение</h2></div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Тема</label>
+        <input id="p6-subject" type="text" value="Не проводится реализация товаров и услуг" placeholder="Кратко о проблеме">
+      </div>
+      <div class="field">
+        <label>Описание</label>
+        <textarea id="p6-body" rows="5">Проведение документа занимает больше двух минут, раньше было 15 секунд. База Бухгалтерия 3.0, работают все бухгалтеры.</textarea>
+      </div>
+      <button class="btn" id="p6-route">маршрутизировать</button>
+      <p class="muted" style="margin-top: 12px;">Модель обучена на {{ model.accuracy.samples }} размеченных обращениях, база знаний — {{ model.articles }} статей.</p>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Решение маршрутизатора</h3>
+      <pre id="p6-summary">Нажмите «маршрутизировать» — покажем группу, приоритет, SLA и подходящую статью.</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Черновик ответа</h2></div>
+      <div class="panel-body"><pre id="p6-draft" class="muted" style="margin: 0;">Черновик появится после маршрутизации.</pre></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" style="margin-top: 18px;">
+  <div class="panel-head"><h2>Очередь обращений</h2><span class="muted right">{{ model.groups|length }} групп поддержки</span></div>
+  <div class="panel-body" style="padding: 0;">
+    <table>
+      <thead><tr><th>Обращение</th><th>Группа</th><th>Приоритет</th><th>Состояние</th><th class="num">Открыто, ч</th><th class="num">SLA, ч</th></tr></thead>
+      <tbody>
+        {% for row in model.tickets[:14] %}
+        <tr>
+          <td><b>{{ row.subject }}</b><div class="muted">{{ row.created_at|dt }}</div></td>
+          <td>{{ row.group_name }}</td>
+          <td>{{ m.badge('risk' if row.priority == 'критический' else 'warn' if row.priority == 'высокий' else 'muted', row.priority) }}</td>
+          <td>{{ m.badge('risk' if row.state == 'просрочено' else 'ok' if row.state == 'закрыт' else 'info', row.state) }}</td>
+          <td class="num">{{ row.hours_open }}</td>
+          <td class="num">{{ row.sla_hours }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

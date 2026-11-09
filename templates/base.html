@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ page_title|default("Портфель решений") }}{% endblock %} · 1С и ИИ</title>
+  <link rel="stylesheet" href="/static/css/sber.css">
+</head>
+<body data-page="{{ page_id|default('') }}">
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">1С</span>
+      <span>Портфель решений<small>администрирование · разработка · ИИ</small></span>
+    </a>
+    <nav class="nav">
+      <a href="/" class="{{ 'active' if page_id == 'landing' else '' }}">Обзор</a>
+      {% for item in nav %}
+      <a href="{{ item.path }}" class="{{ 'active' if active == item.code else '' }}">{{ item.code }}</a>
+      {% endfor %}
+    </nav>
+    <div class="spacer"></div>
+    <a class="btn ghost" href="/docs">API</a>
+  </div>
+</header>
+<main class="shell">
+  {% block content %}{% endblock %}
+  <footer class="footer">
+    <span>Демонстрационный портфель по мотивам вакансии «Программист 1С».</span>
+    <span>Данные синтетические, локальный контур: FastAPI · PostgreSQL · офлайн-модели.</span>
+  </footer>
+</main>
+<script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

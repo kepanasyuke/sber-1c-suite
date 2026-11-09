@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ m.page_head("P2", "Оркестратор резервного копирования", "Задания копирования информационных баз, контроль RPO и разбор журналов: текст ошибки классифицируется центроидной моделью на TF-IDF, результат превращается в причину и рекомендацию.") }}
+
+<div class="grid kpi">
+  {{ m.kpi("Баз в заданиях", model.kpis.total, "полный и дифференциальный бэкап") }}
+  {{ m.kpi("Успешных копий", model.kpis.ok, "статус ok") }}
+  {{ m.kpi("Сбоев", model.kpis.fail, "требуют разбора") }}
+  {{ m.kpi("Нарушен RPO", model.kpis.breach, "по последнему запуску") }}
+  {{ m.kpi("Объём копий", model.kpis.size|spaces, "МБ") }}
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="panel">
+    <div class="panel-head"><h2>Задания копирования</h2></div>
+    <div class="panel-body" style="padding: 0;">
+      <table>
+        <thead><tr><th>База</th><th>Хост</th><th>Расписание</th><th>Статус</th><th class="num">Объём, МБ</th><th></th></tr></thead>
+        <tbody id="p2-rows">
+          {% for job in model.jobs %}
+          <tr>
+            <td><b>{{ job.base_name }}</b><div class="muted">хранение {{ job.retention_days }} дн.</div></td>
+            <td class="mono">{{ job.host_code }}</td>
+            <td>{{ job.schedule }}<div class="muted">{{ job.last_run|dt }}</div></td>
+            <td>{{ m.badge('ok' if job.last_status == 'ok' else 'risk' if job.last_status == 'fail' else 'warn', job.last_status) }}</td>
+            <td class="num">{{ job.size_mb|spaces }}</td>
+            <td><button class="btn ghost" data-job="{{ job.id }}" style="padding: 6px 14px; font-size: 13px;">разобрать журнал</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Вердикт по журналу</h3>
+      <pre id="p2-summary">Выберите задание и нажмите «разобрать журнал» — модель определит причину сбоя по тексту сообщений.</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Разобранные записи</h2></div>
+      <div class="panel-body" id="p2-logs"><p class="muted">Журнал ещё не разобран.</p></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

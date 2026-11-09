@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ m.page_head("P8", "Документооборот: классификация документов", "Тип входящего документа определяется центроидной моделью, реквизиты извлекаются регулярными правилами, ИНН проверяется по контрольным числам, дубли ищутся по косинусной близости TF-IDF.") }}
+
+<div class="grid kpi">
+  {{ m.kpi("Документов", model.kpis.total, "входящий поток") }}
+  {{ m.kpi("Средняя уверенность", model.kpis.average, "косинус к центроиду") }}
+  {{ m.kpi("Недостоверный ИНН", model.kpis.bad_inn, "контрольные числа") }}
+  {{ m.kpi("Дублей", model.kpis.duplicates, "близость ≥ 0,55") }}
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Входящие документы</h2>
+      <button class="btn ghost right" id="p8-run" style="padding: 6px 14px; font-size: 13px;">классифицировать заново</button>
+    </div>
+    <div class="panel-body" style="padding: 0;">
+      <table>
+        <thead><tr><th>Документ</th><th>Тип</th><th>Контрагент</th><th>ИНН</th><th class="num">Сумма</th></tr></thead>
+        <tbody id="p8-rows">
+          {% for row in model.documents %}
+          <tr>
+            <td><b>{{ row.file_name }}</b><div class="muted">{{ row.received_at|dt }}</div></td>
+            <td>{{ m.badge('ok', row.predicted) }}<div class="muted">{{ "%.2f"|format(row.confidence) }}</div></td>
+            <td>{{ row.requisites.counterparty or "—" }}</td>
+            <td class="mono">
+              {{ row.requisites.inn or "—" }}
+              {% if row.requisites.inn %}{{ m.badge('ok' if row.requisites.inn_valid else 'risk', 'верный' if row.requisites.inn_valid else 'ошибка') }}{% endif %}
+            </td>
+            <td class="num">{{ row.requisites.amount|decimal if row.requisites.amount else "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Сводка по потоку</h3>
+      <pre id="p8-summary">{{ model.summary }}</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Распознано по типам</h2></div>
+      <div class="panel-body">
+        <ul class="list-clean">
+          {% for label, count in model.counts.items() %}
+          <li><span class="badge info">{{ label }}</span><span>{{ count }}</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Возможные дубли</h2></div>
+      <div class="panel-body" id="p8-duplicates">
+        {% for item in model.duplicates %}
+        <div class="result-item warn">
+          <div class="result-title">{{ "%.3f"|format(item.score) }}</div>
+          <div class="result-text">{{ item.a }} ↔ {{ item.b }}</div>
+        </div>
+        {% else %}
+        <p class="muted">Похожих документов не найдено.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

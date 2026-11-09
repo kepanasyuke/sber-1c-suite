@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ m.page_head("P1", "Мониторинг серверов 1С", "Метрики CPU, памяти и отклика по хостам кластера, статистика сеансов и автоматическое обнаружение выбросов робастным z-скорингом на медиане и MAD.") }}
+
+<div class="grid kpi">
+  {{ m.kpi("Средний CPU", model.kpis.cpu.avg, "пик " ~ model.kpis.cpu.peak ~ " %") }}
+  {{ m.kpi("Память", model.kpis.ram.avg, "пик " ~ model.kpis.ram.peak ~ " %") }}
+  {{ m.kpi("Отклик", model.kpis.resp.avg, "пик " ~ model.kpis.resp.peak ~ " мс") }}
+  {{ m.kpi("Аномалий", model.anomalies|length, "порог 3,5σ") }}
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Метрики за смену</h2>
+      <div class="right row">
+        <select id="p1-host" style="width: auto;">
+          {% for item in hosts %}
+          <option value="{{ item.code }}" {{ "selected" if item.code == current else "" }}>{{ item.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="panel-body">
+      <svg id="p1-chart" class="chart" preserveAspectRatio="none"></svg>
+      <p class="muted" style="margin: 8px 0 0;">Шаг 10 минут, окно 6 часов. Точки — выбросы с |z| ≥ 3,5.</p>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Вывод модели</h3>
+      <pre id="p1-summary">{{ model.summary }}</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Найденные аномалии</h2></div>
+      <div class="panel-body">
+        <ul class="list-clean" id="p1-anomalies">
+          {% for item in model.anomalies %}
+          <li><span class="badge {{ 'risk' if item.z|abs > 5 else 'warn' }}">{{ item.z }}σ</span>
+            <span><b>{{ item.label }}</b> · {{ item.at }} · {{ item.value }} · {{ item.direction }}</span></li>
+          {% else %}
+          <li class="muted">Выбросов не обнаружено.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" style="margin-top: 18px;">
+  <div class="panel-head"><h2>Самые активные сеансы</h2><span class="muted right">{{ current }}</span></div>
+  <div class="panel-body" style="padding: 0;">
+    <table>
+      <thead><tr><th>Пользователь</th><th>Клиент</th><th>Начало</th><th class="num">Длительность, мин</th><th class="num">Вызовы сервера</th></tr></thead>
+      <tbody>
+        {% for row in model.sessions %}
+        <tr><td>{{ row.login }}</td><td>{{ row.app }}</td><td>{{ row.started_at }}</td><td class="num">{{ row.duration_min }}</td><td class="num">{{ row.calls|spaces }}</td></tr>
+        {% else %}
+        <tr><td colspan="5" class="muted">Сеансов нет.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="application/json" id="p1-data">{{ model|tojson }}</script>
+{% endblock %}

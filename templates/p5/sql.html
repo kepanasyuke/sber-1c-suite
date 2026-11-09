@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ page_title and "" }}
+{{ m.page_head("P5", "SQL-аналитик MSSQL/PostgreSQL", "Статический разбор запроса и плана выполнения: полное чтение таблиц, функции в предикатах, LIKE с ведущим шаблоном, расхождение оценки строк — с оценкой и готовой рекомендацией по индексу.") }}
+
+{% if result %}
+<div class="grid kpi">
+  <div class="kpi">
+    <div class="kpi-label">Оценка запроса</div>
+    <div class="kpi-value"><span id="p5-score">{{ result.score }}</span> <small>из 100</small></div>
+    <div class="kpi-hint">цена и риск по правилам</div>
+  </div>
+  {{ m.kpi("Замечаний", result.findings|length, "разобрано правилами") }}
+  {{ m.kpi("Замер", result.duration, "мс") }}
+  {{ m.kpi("СУБД", result.dbms, chosen.title) }}
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="stack">
+    <div class="panel">
+      <div class="panel-head"><h2>Запрос</h2><span class="muted right">пример: {{ chosen.title }}</span></div>
+      <div class="panel-body">
+        <div class="field">
+          <label>SQL</label>
+          <textarea id="p5-query" rows="10">{{ chosen.query_text }}</textarea>
+        </div>
+        <div class="field">
+          <label>План выполнения</label>
+          <textarea id="p5-plan" rows="8">{{ chosen.plan_text }}</textarea>
+        </div>
+        <div class="row">
+          <select id="p5-dbms" style="width: auto;">
+            <option {{ "selected" if result.dbms == "PostgreSQL" else "" }}>PostgreSQL</option>
+            <option {{ "selected" if result.dbms == "MS SQL Server" else "" }}>MS SQL Server</option>
+          </select>
+          <input id="p5-duration" type="number" value="{{ result.duration }}" style="width: 140px;" title="Замер, мс">
+          <button class="btn" id="p5-analyze">разобрать</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Замечания</h2></div>
+      <div class="panel-body" id="p5-findings">
+        {% for item in result.findings %}
+        <div class="result-item {{ 'risk' if item.level == 'high' else 'warn' if item.level == 'warn' else '' }}">
+          <div class="result-title">{{ item.label }} · {{ item.title }}</div>
+          <div class="result-text">{{ item.detail }}</div>
+          <div class="result-text" style="margin-top: 4px;"><b>Что делать:</b> {{ item.advice }}</div>
+        </div>
+        {% else %}
+        <p class="muted">Правила не нашли проблем.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Вывод</h3>
+      <pre id="p5-summary">{{ result.summary }}</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Индекс</h2></div>
+      <div class="panel-body">
+        {% if result.index.ddl %}
+        <p class="mono" id="p5-index" style="background: var(--bg); padding: 12px; border-radius: 12px;">{{ result.index.ddl }}</p>
+        <p class="muted">Столбцы взяты из условий фильтра: {{ result.index.columns|join(", ") }}.</p>
+        {% else %}
+        <p class="muted" id="p5-index">Явных условий для индекса не найдено.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Примеры из базы</h2></div>
+      <div class="panel-body">
+        <ul class="list-clean">
+          {% for item in samples %}
+          <li><a href="/p5?sample={{ item.id }}">{{ item.title }}</a><span class="muted"> · {{ item.dbms }}</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

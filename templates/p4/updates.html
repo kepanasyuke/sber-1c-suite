@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ m.page_head("P4", "Обновления конфигураций", "Сравнение состава объектов между версиями типовой конфигурации, оценка риска по типам объектов и чек-лист обновления с учётом расширений.") }}
+
+<div class="grid kpi">
+  {{ m.kpi("Новых объектов", result.changes.added|length, result.old ~ " → " ~ result.new) }}
+  {{ m.kpi("Удалено", result.changes.removed|length, "проверить ссылки") }}
+  {{ m.kpi("Изменено", result.changes.changed|length, "сверка контрольных сумм") }}
+  {{ m.kpi("Риск обновления", "%.2f"|format(result.risk), result.level) }}
+</div>
+
+<div class="panel" style="margin-top: 18px;">
+  <div class="panel-head">
+    <h2>Параметры сравнения</h2>
+    <div class="right row">
+      <select id="p4-config" style="width: auto;">
+        {% for item in model.configs %}
+        <option value="{{ item.config_name }}" {{ "selected" if item.config_name == config else "" }}>{{ item.config_name }}</option>
+        {% endfor %}
+      </select>
+      <select id="p4-old" style="width: auto;">
+        {% for item in versions %}
+        <option value="{{ item.version }}" {{ "selected" if item.version == result.old else "" }}>{{ item.version }}</option>
+        {% endfor %}
+      </select>
+      <select id="p4-new" style="width: auto;">
+        {% for item in versions %}
+        <option value="{{ item.version }}" {{ "selected" if item.version == result.new else "" }}>{{ item.version }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn" id="p4-compare">сравнить</button>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="row" style="gap: 24px;">
+      <div style="flex: 1; min-width: 220px;">
+        <div class="kpi-label">Риск <b id="p4-risk">{{ "%.2f"|format(result.risk) }}</b></div>
+        {{ m.meter(result.risk * 100, 'risk' if result.risk >= 0.7 else 'warn' if result.risk >= 0.35 else '') }}
+      </div>
+      <div class="muted">Вес: Роль 0,30 · Регистр 0,30 · Документ 0,25 · Справочник 0,15 · Отчёт 0,10</div>
+    </div>
+  </div>
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="stack">
+    <div class="panel">
+      <div class="panel-head"><h2>Изменения состава объектов</h2></div>
+      <div class="panel-body" style="padding: 0;">
+        <table>
+          <thead><tr><th>Тип</th><th>Объект</th><th>Изменение</th></tr></thead>
+          <tbody id="p4-changes">
+            {% for group, title, tone in [('added', 'Добавлен', 'ok'), ('changed', 'Изменён', 'warn'), ('removed', 'Удалён', 'risk')] %}
+              {% for item in result.changes[group] %}
+              <tr><td>{{ item.kind }}</td><td class="mono">{{ item.name }}</td><td>{{ m.badge(tone, title) }}</td></tr>
+              {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Сводка и чек-лист</h3>
+      <pre id="p4-summary">{{ result.summary }}</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Порядок обновления</h2></div>
+      <div class="panel-body">
+        <ul class="list-clean" id="p4-checklist">
+          {% for step in result.checklist %}
+          <li><span class="badge muted">{{ loop.index }}</span><span>{{ step }}</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

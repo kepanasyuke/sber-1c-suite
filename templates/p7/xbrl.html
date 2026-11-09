@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ m.page_head("P7", "XBRL/XML финансовая отчётность", "Разбор XBRL-фактов из XML, проверка обязательных показателей, сходимости баланса и периода, человекочитаемая сводка по отчёту.") }}
+
+<div class="grid kpi">
+  {{ m.kpi("Показателей в отчёте", result.facts|length, result.period.start ~ " — " ~ result.period.end) }}
+  {{ m.kpi("Замечаний", result.issues|length, "проверки обязательных и арифметики") }}
+  <div class="kpi">
+    <div class="kpi-label">Статус</div>
+    <div class="kpi-value" id="p7-status">{{ result.status }}</div>
+    <div class="kpi-hint">по итогам валидации</div>
+  </div>
+  {{ m.kpi("Отчётов в базе", model.reports|length, "XML-файлы ЦБ") }}
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="stack">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Факты отчёта</h2>
+        <button class="btn ghost right" id="p7-validate" data-report="{{ current }}" style="padding: 6px 14px; font-size: 13px;">проверить</button>
+      </div>
+      <div class="panel-body" style="padding: 0;">
+        <table>
+          <thead><tr><th>Показатель</th><th class="num">Значение</th></tr></thead>
+          <tbody id="p7-facts">
+            {% for key, value in result.facts.items() %}
+            <tr><td class="mono">{{ key }}</td><td class="num">{{ value }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Замечания валидатора</h2></div>
+      <div class="panel-body" id="p7-issues">
+        {% for item in result.issues %}
+        <div class="result-item {{ 'risk' if item.level == 'risk' else 'warn' }}">
+          <div class="result-title">{{ item.title }}</div>
+          <div class="result-text">{{ item.detail }}</div>
+        </div>
+        {% else %}
+        <p class="muted">Проверки пройдены, замечаний нет.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Сводка</h3>
+      <pre id="p7-summary">{{ result.summary }}</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Отчёты</h2></div>
+      <div class="panel-body">
+        <ul class="list-clean">
+          {% for item in model.reports %}
+          <li>
+            <a href="/p7?report={{ item.id }}">{{ item.period }}</a>
+            <span class="muted">· {{ item.file_name }}</span>
+            {% if item.id == current %}<span class="badge green">выбран</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Портфель решений для 1С{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div>
+    <span class="eyebrow">Портфель · 8 проектов</span>
+    <h1>Администрирование и разработка <em>1С</em> с бэкендом, фронтендом и ИИ</h1>
+    <p class="lead">
+      Восемь рабочих модулей закрывают требования вакансии: обслуживание информационных баз
+      на PostgreSQL и MS SQL Server, обновление типовых конфигураций, права доступа,
+      Service Desk и интеграции. Каждый модуль — FastAPI, PostgreSQL, офлайн-модель и интерфейс.
+    </p>
+  </div>
+  <div class="hero-side">
+    <div class="hero-note"><b>Проектов в портфеле</b><span>{{ stats.projects }}</span></div>
+    <div class="hero-note"><b>Метрик в базе</b><span>{{ stats.metrics|spaces }}</span></div>
+    <div class="hero-note"><b>Демо-данных, записей</b><span>{{ stats.rows|spaces }}</span></div>
+  </div>
+</section>
+
+<div class="grid kpi" style="margin-bottom: 34px;">
+  {{ m.kpi("Активных хостов", stats.hosts, "кластер 1С: приложения, СУБД, веб") }}
+  {{ m.kpi("Баз под наблюдением", stats.bases, "резервное копирование и RPO") }}
+  {{ m.kpi("Средний срок решения", stats.mttr ~ " ч", "Service Desk, синтетика за квартал") }}
+  {{ m.kpi("Точность маршрутизации", stats.routing ~ " %", "кросс-валидация на 25 обращениях") }}
+</div>
+
+<div class="section-head">
+  <h2>Проекты портфеля</h2>
+  <span>бэкенд · ИИ · фронтенд в каждом модуле</span>
+</div>
+
+<div class="grid cards">
+  {% for item in modules %}
+  <a class="card link" href="{{ item.path }}">
+    <div class="row">
+      <span class="card-code">{{ item.code }}</span>
+      <span class="right tag {{ 'dark' if item.accent == 'graphite' else 'green' }}">{{ item.tags|join(' · ') }}</span>
+    </div>
+    <h3>{{ item.title }}</h3>
+    <p>{{ item.summary }}</p>
+    <div class="card-foot">
+      {% for tech in item.stack %}<span class="tag">{{ tech }}</span>{% endfor %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="section-head">
+  <h2>Как устроен код</h2>
+  <span>правила, которые проверяются автоматически</span>
+</div>
+
+<div class="split">
+  <div class="panel">
+    <div class="panel-head"><h2>Стиль, который держит линтер</h2></div>
+    <div class="panel-body">
+      <ul class="list-clean">
+        <li><b>ST001</b><span>один выход из функции: <span class="mono">return</span> и <span class="mono">while</span> считаются выходом, второй выход — ошибка сборки.</span></li>
+        <li><b>ST002</b><span>тело функции — не больше двух инструкций, остальное выносится в именованные помощники.</span></li>
+        <li><b>ST003</b><span>запрещены <span class="mono">while</span>, <span class="mono">break</span>, <span class="mono">continue</span> — вместо них включения, фильтры и рекурсия по дереву.</span></li>
+        <li><b>ST004</b><span>те же запреты для фронтенд-модулей: вся логика — на выражениях и <span class="mono">for...of</span>.</span></li>
+      </ul>
+      <p class="muted" style="margin-top: 16px;">Проверка: <span class="mono">python tools/style_lint.py</span> · линтер включён в тесты.</p>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>ИИ без внешних сервисов</h3>
+      <p>TF-IDF и центроидный классификатор, BM25 для базы знаний, робастный z-скоринг на медиане и MAD.
+         Всё считается в процессе приложения, данные не покидают контур.</p>
+      <p class="muted">Подключение внешней LLM — переменная окружения <span class="mono">LLM_BASE_URL</span>.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Стек</h2></div>
+      <div class="panel-body">
+        <div class="card-foot" style="margin: 0;">
+          <span class="tag green">Python 3</span><span class="tag green">FastAPI</span>
+          <span class="tag green">PostgreSQL 16</span><span class="tag">Jinja2</span>
+          <span class="tag">ES-модули</span><span class="tag">ruff</span>
+          <span class="tag">pytest</span><span class="tag">style_lint</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

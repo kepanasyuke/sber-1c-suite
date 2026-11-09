@@ -1,0 +1,13 @@
+line-length = 100
+target-version = "py312"
+extend-exclude = [".pg", ".pgdata", "docs", "logs", ".venv"]
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C90"]
+ignore = ["E501", "B008"]
+
+[lint.mccabe]
+max-complexity = 4
+
+[lint.isort]
+combine-as-imports = true

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block content %}
+{{ m.page_head("P3", "Аудит прав доступа", "Матрица «пользователь — роль — объект», поиск избыточных назначений: уволенные с доступом, администраторы вне ИТ, роли не по подразделению и права на все объекты.") }}
+
+<div class="grid kpi">
+  {{ m.kpi("Учётных записей", model.kpis.total, "включая уволенных") }}
+  {{ m.kpi("Высокий риск", model.kpis.high, "балл ≥ 0,70") }}
+  {{ m.kpi("Уволенных с доступом", model.kpis.fired, "требуют блокировки") }}
+  {{ m.kpi("Администраторов", model.kpis.admins, "полные права") }}
+  {{ m.kpi("Правил доступа", model.kpis.rules, "роль × объект") }}
+</div>
+
+<div class="split" style="margin-top: 18px;">
+  <div class="panel">
+    <div class="panel-head"><h2>Рейтинг риска учётных записей</h2><button class="btn ghost right" id="p3-recount" style="padding: 6px 14px; font-size: 13px;">пересчитать</button></div>
+    <div class="panel-body" style="padding: 0;">
+      <table>
+        <thead><tr><th>Сотрудник</th><th>Роли</th><th class="num">Балл</th><th>Нарушения</th></tr></thead>
+        <tbody id="p3-rows">
+          {% for user in model.risky %}
+          <tr>
+            <td><b>{{ user.full_name }}</b><div class="muted">{{ user.position }} · {{ user.department }}</div></td>
+            <td>{% for role in user.roles %}<span class="tag">{{ role }}</span> {% endfor %}</td>
+            <td class="num">
+              <b>{{ "%.2f"|format(user.score) }}</b>
+              {{ m.meter(user.score * 100, 'risk' if user.score >= 0.7 else 'warn' if user.score >= 0.35 else '') }}
+            </td>
+            <td>
+              {% for issue in user.issues %}
+              <div class="result-item {{ 'risk' if issue.weight >= 0.7 else 'warn' if issue.weight >= 0.4 else '' }}">
+                <div class="result-title">{{ issue.code }}</div>
+                <div class="result-text">{{ issue.text }}</div>
+              </div>
+              {% else %}<span class="muted">чисто</span>{% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="ai-block">
+      <h3>Сводка аудита</h3>
+      <pre id="p3-summary">{{ model.summary }}</pre>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Матрица ролей</h2></div>
+      <div class="panel-body" style="padding: 0;">
+        <table>
+          <thead><tr><th>Роль</th><th class="num">Правил</th><th class="num">Шаблон «*»</th></tr></thead>
+          <tbody>
+            {% for role in model.matrix %}
+            <tr><td>{{ role.title }}<div class="muted mono">{{ role.role }}</div></td><td class="num">{{ role.rules }}</td><td class="num">{{ role.wildcards }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
